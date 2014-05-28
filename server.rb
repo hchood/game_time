@@ -76,7 +76,7 @@ end
 
 def sort_results(results)
   results.sort_by! do |result|
-    -result[:wins]
+    [-result[:wins], result[:losses]]
   end
 end
 
@@ -92,3 +92,27 @@ get '/leaderboard' do
 
   erb :index
 end
+
+get '/teams/:team_name' do
+  @team_name = params[:team_name]
+
+  game_results = read_data_from('nfl_results.csv')
+  team_records = create_team_records(game_results)
+
+  @team_record = find_team_hash(team_records, @team_name)
+
+  @games_played = []
+
+  game_results.each do |game|
+    if game[:home_team] == @team_name || game[:away_team] == @team_name
+      @games_played << game
+    end
+  end
+
+  erb :show
+end
+
+
+
+
+
